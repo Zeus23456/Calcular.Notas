@@ -13,7 +13,7 @@ const CONFIG = {
     "Prata": { price: 150, diamonds: 2000 },
     "Ouro": { price: 200, diamonds: 3000 }
   },
-  whatsappRegex: /^\+?\d{1,4}?\s?\d{9,}$/, // Formato internacional do WhatsApp
+  whatsappRegex: /^(?:\+238|238)?\s?[95]\d{6}$/, // Formato CV: (+238) 9XXXXXX ou 5XXXXXX
   minNameLength: 3,
   emailRegex: /^[^\s@]+@[^\s@]+\.[^\s@]+$/ // Validação básica de email
 };
@@ -28,7 +28,14 @@ function validateId(id) {
 }
 
 function validateWhatsapp(whatsapp) {
-  return CONFIG.whatsappRegex.test(whatsapp);
+  // Remove todos os espaços e caracteres especiais
+  const cleanNumber = whatsapp.replace(/[\s\-\(\)]/g, '');
+  
+  // Se começa com +238 ou 238, remove para padronizar
+  const normalizedNumber = cleanNumber.replace(/^\+238/, '').replace(/^238/, '');
+  
+  // Testa o formato (deve começar com 9 ou 5 e ter 7 dígitos no total)
+  return CONFIG.whatsappRegex.test(normalizedNumber);
 }
 
 function validateEmail(email) {
@@ -83,7 +90,7 @@ document.addEventListener("DOMContentLoaded", function() {
       }
 
       if (!whatsapp || !validateWhatsapp(whatsapp)) {
-        showAlert("⚠️ WhatsApp inválido! Use o formato internacional.", "warning");
+        showAlert("⚠️ WhatsApp inválido! Use o formato +238 9XXXXXX ou +238 5XXXXXX", "warning");
         return;
       }
 
@@ -215,20 +222,26 @@ function sendToWhatsApp(message) {
   return new Promise((resolve, reject) => {
     try {
       const url = `https://wa.me/${CONFIG.whatsappNumber}?text=${encodeURIComponent(message)}`;
-      const windowRef = window.open(url, '_blank');
       
-      if (!windowRef) {
-        reject(new Error("Bloqueador de pop-up impediu a abertura do WhatsApp"));
-        return;
-      }
+      // Cria um link temporário
+      const link = document.createElement('a');
+      link.href = url;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      link.style.display = 'none';
+      document.body.appendChild(link);
       
-      // Dá um pequeno delay para garantir que a janela abriu
-      setTimeout(() => {
-        resolve(true);
-      }, 1000);
+      // Simula o clique do usuário
+      link.click();
+      
+      // Remove o link
+      document.body.removeChild(link);
+      
+      // Considera como sucesso
+      resolve(true);
     } catch (error) {
       console.error("Erro ao abrir WhatsApp:", error);
-      reject(error);
+      reject(new Error("Não foi possível abrir o WhatsApp. Por favor, clique no botão 'Conversar' na seção de contato."));
     }
   });
 }
@@ -272,39 +285,55 @@ function validatePassword(password) {
 // Funções para o processo automático
 function showProcessModal() {
     const modal = document.getElementById('processModal');
-    modal.classList.add('active');
+    if (modal) {
+        modal.classList.add('active');
+    }
 }
 
 function hideProcessModal() {
     const modal = document.getElementById('processModal');
-    modal.classList.remove('active');
+    if (modal) {
+        modal.classList.remove('active');
+    }
 }
 
 async function simulateAutomatedProcess() {
-    const steps = document.querySelectorAll('.progress-step');
-    const messages = [
-        "Verificando pagamento...",
-        "Validando dados da conta...",
-        "Iniciando serviço...",
-        "Serviço ativado com sucesso!"
-    ];
+    try {
+        const steps = document.querySelectorAll('.progress-step');
+        const processMessage = document.querySelector('.process-message');
+        if (!steps.length || !processMessage) {
+            console.error('Elementos do modal não encontrados');
+            return;
+        }
 
-    for (let i = 0; i < steps.length; i++) {
-        // Atualiza o passo atual
-        steps[i].classList.add('active');
-        document.querySelector('.process-message').textContent = messages[i];
+        const messages = [
+            "Verificando pagamento...",
+            "Validando dados da conta...",
+            "Iniciando serviço...",
+            "Serviço ativado com sucesso!"
+        ];
 
-        // Aguarda um tempo para simular o processamento
-        await new Promise(resolve => setTimeout(resolve, 1500));
+        for (let i = 0; i < steps.length; i++) {
+            // Atualiza o passo atual
+            steps[i].classList.add('active');
+            processMessage.textContent = messages[i];
 
-        // Marca o passo como concluído
-        steps[i].classList.add('done');
+            // Aguarda um tempo para simular o processamento
+            await new Promise(resolve => setTimeout(resolve, 1500));
+
+            // Marca o passo como concluído
+            steps[i].classList.add('done');
+        }
+
+        // Aguarda um momento final para mostrar o sucesso
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        showAlert("✅ Serviço ativado com sucesso!", "success");
+        hideProcessModal();
+    } catch (error) {
+        console.error('Erro no processo automático:', error);
+        hideProcessModal();
+        showAlert("❌ Erro ao processar pedido. Tente novamente.", "error");
     }
-
-    // Aguarda um momento final para mostrar o sucesso
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    showAlert("✅ Serviço ativado com sucesso!", "success");
-    hideProcessModal();
 }
 
 // Função para mascarar email no histórico
