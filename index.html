@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Serviços profissionais de rankeamento para Free Fire. Suba de patente com segurança e rapidez!">
+    <meta name="keywords" content="Free Fire, rankeamento, up free fire, diamantes free fire, patente free fire">
+    <meta name="author" content="FF UP Professional">
+    <meta property="og:title" content="UP Professional Free Fire - Serviços de Rankeamento">
+    <meta property="og:description" content="Suba de patente com segurança e rapidez! Serviços profissionais de rankeamento para Free Fire.">
+    <meta property="og:image" content="images/logo.png">
+    <meta name="theme-color" content="#e91e63">
+    <title>UP Professional Free Fire - Serviços de Rankeamento</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="logo-container">
+            <img src="images/logo.png" alt="FF UP Pro" class="logo">
+            <h1>FF UP Professional</h1>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="#servicos">Serviços</a></li>
+                <li><a href="#como-funciona">Como Funciona</a></li>
+                <li><a href="#contato">Contato</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Hero Banner -->
+    <section class="hero">
+        <div class="hero-content">
+            <h2>Seu Rankeamento Profissional</h2>
+            <p>Do Bronze ao Elite com segurança e rapidez</p>
+            <a href="#pedir-agora" class="cta-button">Pedir Agora</a>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section id="servicos" class="services">
+        <h2><i class="fas fa-crown"></i> Nossos Serviços</h2>
+        <div class="service-grid">
+            <div class="service-card">
+                <i class="fas fa-medal bronze"></i>
+                <h3>Bronze</h3>
+                <p>Até Platina</p>
+                <div class="price">100$</div>
+                <ul>
+                    <li>+1000 Diamantes</li>
+                    <li>Suporte 24h</li>
+                </ul>
+            </div>
+            
+            <div class="service-card featured">
+                <span class="popular">Popular</span>
+                <i class="fas fa-medal silver"></i>
+                <h3>Prata</h3>
+                <p>Até Diamante</p>
+                <div class="price">150$</div>
+                <ul>
+                    <li>+2000 Diamantes</li>
+                    <li>Prioridade</li>
+                </ul>
+            </div>
+            
+            <div class="service-card">
+                <i class="fas fa-medal gold"></i>
+                <h3>Ouro</h3>
+                <p>Até Mestre</p>
+                <div class="price">200$</div>
+                <ul>
+                    <li>+3000 Diamantes</li>
+                    <li>Atendimento VIP</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- Order Form Section -->
+    <section id="pedir-agora" class="order-form">
+        <h2><i class="fas fa-gamepad"></i> Faça Seu Pedido</h2>
+        <form id="pedidoForm">
+            <div class="form-group">
+                <label for="nome">Seu Nome:</label>
+                <input type="text" id="nome" name="nome" placeholder="Ex: Lucas Barros" required>
+            </div>
+              <div class="form-group">
+                <label for="conta">Conta Vinculada:</label>
+                <select id="conta" name="conta" required>
+                    <option value="">Selecione...</option>
+                    <option value="facebook">Facebook</option>
+                    <option value="google">Google</option>
+                </select>
+            </div>            <div class="form-group">
+                <label for="email">Email da Conta:</label>
+                <input type="email" id="email" name="email" placeholder="Ex: seu.email@gmail.com" required>
+            </div>
+
+            <div class="form-group">
+                <label for="senha">Senha da Conta:</label>
+                <div class="password-container">
+                    <input type="password" id="senha" name="senha" placeholder="Senha da sua conta vinculada" required>
+                    <button type="button" class="toggle-password" onclick="togglePassword()">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </div>
+                <small class="security-note">🔒 Suas informações são enviadas de forma segura</small>
+            </div>
+            
+            <div class="form-group">
+                <label for="whatsapp">WhatsApp:</label>
+                <input type="tel" id="whatsapp" name="whatsapp" placeholder="+238 9129987" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="servico">Serviço:</label>
+                <select id="servico" name="servico" required>
+                    <option value="">Selecione...</option>
+                    <option value="Bronze">Bronze - 100$ (+1000 diamantes)</option>
+                    <option value="Prata">Prata - 150$ (+2000 diamantes)</option>
+                    <option value="Ouro">Ouro - 200$ (+3000 diamantes)</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>Método de Pagamento:</label>
+                <div class="payment-options">
+                    <label>
+                        <input type="radio" name="pagamento" value="TMAIS" required>
+                        <img src="images/tmais.png" alt="TMAIS">
+                    </label>
+                    <label>
+                        <input type="radio" name="pagamento" value="CV Móvel" required>
+                        <img src="images/cvmovel.png" alt="CV Móvel">
+                    </label>
+                
+                    </label>
+                </div>
+            </div>
+            
+            <button type="submit" class="submit-btn">
+                <i class="fas fa-paper-plane"></i> Enviar Pedido
+            </button>
+        </form>
+
+        <!-- Histórico de Pedidos -->
+        <div id="historico" class="historico-section">
+            <h3><i class="fas fa-history"></i> Últimos Pedidos</h3>
+            <!-- Histórico será preenchido via JavaScript -->
+        </div>
+    </section>
+
+    <!-- Como Funciona Section com Tooltips -->
+    <section id="como-funciona" class="how-it-works">
+        <h2><i class="fas fa-question-circle"></i> Como Funciona</h2>
+        <div class="steps">
+            <div class="step" data-tooltip="Preencha todos os campos corretamente">
+                <div class="step-number">1</div>
+                <h3>Envie seu pedido</h3>
+                <p>Preencha o formulário com seus dados</p>
+            </div>
+            <div class="step" data-tooltip="Envie uma captura de tela do pagamento">
+                <div class="step-number">2</div>
+                <h3>Confirme o pagamento</h3>
+                <p>Envie o comprovante via WhatsApp</p>
+            </div>
+            <div class="step" data-tooltip="Receba atualizações em tempo real">
+                <div class="step-number">3</div>
+                <h3>Acompanhe em tempo real</h3>
+                <p>Receba atualizações do progresso</p>
+            </div>
+        </div>
+    </section>
+    <!-- Contact Section -->
+    <section id="contato" class="contact">
+        <h2><i class="fas fa-headset"></i> Contato</h2>
+        <div class="contact-methods">
+            <div class="contact-card whatsapp">
+                <i class="fab fa-whatsapp"></i>
+                <h3>WhatsApp</h3>
+                <p>+244 123 456 789</p>
+                <a href="https://wa.me/244123456789" target="_blank">Conversar</a>
+            </div>
+            <div class="contact-card instagram">
+                <i class="fab fa-instagram"></i>
+                <h3>Instagram</h3>
+                <p>@ffuppro</p>
+                <a href="https://instagram.com/ffuppro" target="_blank">Seguir</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-logo">
+                <img src="images/logo.png" alt="FF UP Pro">
+                <p>Serviços profissionais de rankeamento</p>
+            </div>
+            <div class="footer-links">
+                <h3>Links Rápidos</h3>
+                <ul>
+                    <li><a href="#servicos">Serviços</a></li>
+                    <li><a href="#como-funciona">Como Funciona</a></li>
+                    <li><a href="#contato">Contato</a></li>
+                </ul>
+            </div>
+            
+        </div>
+    </footer>
+
+    <!-- Modal de Processo Automático -->
+    <div id="processModal" class="process-modal">
+        <div class="process-content">
+            <h3><i class="fas fa-cogs fa-spin"></i> Processando seu pedido</h3>
+            <div class="progress-steps">
+                <div class="progress-step">
+                    <i class="fas fa-check-circle"></i>
+                    <span>Verificando pagamento</span>
+                    <div class="progress-line"></div>
+                </div>
+                <div class="progress-step">
+                    <i class="fas fa-check-circle"></i>
+                    <span>Validando dados da conta</span>
+                    <div class="progress-line"></div>
+                </div>
+                <div class="progress-step">
+                    <i class="fas fa-check-circle"></i>
+                    <span>Iniciando serviço</span>
+                    <div class="progress-line"></div>
+                </div>
+                <div class="progress-step">
+                    <i class="fas fa-check-circle"></i>
+                    <span>Serviço ativado com sucesso!</span>
+                </div>
+            </div>
+            <p class="process-message">Aguarde enquanto processamos seu pedido automaticamente...</p>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
