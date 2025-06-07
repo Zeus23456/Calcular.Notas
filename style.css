@@ -47,9 +47,26 @@ nav a {
 }
 
 .hero {
-    background: url('images/banner.jpg') center/cover no-repeat;
+    background: url('https://wallpaperaccess.com/full/1517339.jpg') center/cover no-repeat;
     padding: 5rem 2rem;
     text-align: center;
+    position: relative;
+}
+
+.hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5); /* Overlay escuro para melhor legibilidade */
+    z-index: 1;
+}
+
+.hero-content {
+    position: relative;
+    z-index: 2; /* Coloca o conteúdo acima do overlay */
 }
 
 .hero-content h2 {
@@ -121,6 +138,15 @@ form input, form select {
     flex-wrap: wrap;
     gap: 1rem;
     margin-top: 0.5rem;
+}
+
+.payment-options img {
+    width: 120px; /* Largura fixa */
+    height: 60px; /* Altura fixa */
+    object-fit: contain; /* Mantém a proporção da imagem */
+    background-color: #fff; /* Fundo branco */
+    padding: 5px; /* Espaçamento interno */
+    border-radius: 5px; /* Bordas arredondadas */
 }
 
 .payment-method {
@@ -712,4 +738,284 @@ input[type="email"]:focus {
     0% { transform: scale(1); }
     50% { transform: scale(1.2); }
     100% { transform: scale(1); }
+}
+
+/* Seção de Extras (Calculadora e Mini-jogo) */
+.extras-section {
+    background: #1a1a1a;
+    padding: 3rem 2rem;
+}
+
+.extras-section .container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.calculator-container, .bonus-game {
+    background: #222;
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.calculator-container h3, .bonus-game h3 {
+    color: #e91e63;
+    margin-bottom: 1.5rem;
+    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.calc-group {
+    margin-bottom: 1.5rem;
+}
+
+.calc-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: #fff;
+}
+
+.calc-group input {
+    width: 100%;
+    padding: 0.75rem;
+    border: 2px solid #333;
+    border-radius: 5px;
+    background: #2c2c2c;
+    color: #fff;
+    font-size: 1.1rem;
+}
+
+.calc-result {
+    background: #2c2c2c;
+    padding: 1rem;
+    border-radius: 5px;
+    margin-top: 1rem;
+}
+
+.calc-result p {
+    margin: 0.5rem 0;
+    color: #fff;
+}
+
+.calc-result span {
+    color: #4CAF50;
+    font-weight: bold;
+}
+
+/* Roleta */
+.roulette-container {
+    text-align: center;
+    background: #222;
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin: 1rem auto;
+    max-width: 600px;
+}
+
+.roulette {
+    height: 120px;
+    background: linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0) 10%, rgba(0,0,0,0) 90%, rgba(0,0,0,0.3));
+    border-radius: 10px;
+    margin: 1rem 0;
+    overflow: hidden;
+    position: relative;
+    border: 2px solid #333;
+}
+
+.roulette-item {
+    height: 120px;
+    line-height: 120px;
+    text-align: center;
+    color: #fff;
+    font-size: 1.5rem;
+    font-weight: bold;
+    position: absolute;
+    width: 100%;
+    transition: transform 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.roulette-item img {
+    height: 40px;
+    width: 40px;
+    object-fit: contain;
+}
+
+.roulette-item.diamond {
+    background: linear-gradient(45deg, #1a237e, #3949ab);
+}
+
+.roulette-item.code {
+    background: linear-gradient(45deg, #b71c1c, #e53935);
+}
+
+.roulette-item.pass {
+    background: linear-gradient(45deg, #004d40, #00897b);
+}
+
+.spin-button {
+    background: #e91e63;
+    color: white;
+    border: none;
+    padding: 1rem 2rem;
+    border-radius: 5px;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 1rem auto;
+}
+
+.spin-button:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 2px 8px rgba(233, 30, 99, 0.4);
+}
+
+.spin-button:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    background: #666;
+}
+
+.spin-info {
+    color: #aaa;
+    margin: 1rem 0;
+    font-size: 1.1rem;
+}
+
+.spin-result {
+    color: #4CAF50;
+    font-weight: bold;
+    font-size: 1.2rem;
+    min-height: 2rem;
+    padding: 1rem;
+    background: rgba(76, 175, 80, 0.1);
+    border-radius: 5px;
+    margin-top: 1rem;
+    display: none;
+}
+
+.spin-result.show {
+    display: block;
+    animation: fadeIn 0.5s ease-out;
+}
+
+.balance-display {
+    background: #2c2c2c;
+    padding: 1rem;
+    border-radius: 5px;
+    margin: 1rem 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.balance-amount {
+    font-size: 1.2rem;
+    color: #4CAF50;
+    font-weight: bold;
+}
+
+.reload-balance {
+    background: #4CAF50;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.reload-balance:hover {
+    background: #45a049;
+    transform: translateY(-2px);
+}
+
+@keyframes spin {
+    from { transform: translateY(0); }
+    to { transform: translateY(-600px); }
+}
+
+.spinning {
+    animation: spin 0.5s linear infinite;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Modal de pagamento */
+.payment-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.9);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+}
+
+.payment-modal.show {
+    display: flex;
+}
+
+.payment-modal-content {
+    background: #222;
+    padding: 2rem;
+    border-radius: 10px;
+    max-width: 400px;
+    width: 90%;
+    text-align: center;
+}
+
+.payment-modal-content h3 {
+    color: #e91e63;
+    margin-bottom: 1rem;
+}
+
+.payment-amount {
+    font-size: 2rem;
+    color: #4CAF50;
+    margin: 1rem 0;
+    font-weight: bold;
+}
+
+.payment-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-top: 1rem;
+}
+
+.payment-buttons button {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.confirm-payment {
+    background: #4CAF50;
+    color: white;
+}
+
+.cancel-payment {
+    background: #f44336;
+    color: white;
 }
