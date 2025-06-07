@@ -186,15 +186,26 @@ function loadHistory() {
 
 // Formata a mensagem para WhatsApp
 function formatMessage(nome, conta, email, senha, whatsapp, servico, metodoPagamento) {
-  return `🎮 *PEDIDO FREE FIRE UP* 🎮\n\n` +
-         `👤 Nome: ${nome}\n` +
-         `🔑 Conta: ${conta}\n` +
-         `📧 Email: ${email}\n` +
-         `🔒 Senha: ${maskPassword(senha)}\n` +
-         `📞 WhatsApp: ${whatsapp}\n` +
-         `💎 Serviço: ${servico} (${CONFIG.services[servico].price}$)\n` +
-         `💳 Pagamento: ${metodoPagamento}\n\n` +
-         `_Mensagem automática do site_`;
+  const dataHora = new Date().toLocaleString('pt-BR');
+  return `🎮 *NOVO PEDIDO DE UP* 🎮\n\n` +
+         `📅 Data: ${dataHora}\n` +
+         `━━━━━━━━━━━━━━━\n` +
+         `👤 *DADOS DO CLIENTE*\n` +
+         `Nome: ${nome}\n` +
+         `WhatsApp: ${whatsapp}\n\n` +
+         `🎯 *DADOS DO SERVIÇO*\n` +
+         `Pacote: ${servico}\n` +
+         `Valor: ${CONFIG.services[servico].price}$\n` +
+         `Bônus: ${CONFIG.services[servico].diamonds} diamantes\n\n` +
+         `🔐 *DADOS DA CONTA*\n` +
+         `Tipo: ${conta}\n` +
+         `Email: ${email}\n` +
+         `Senha: ${maskPassword(senha)}\n\n` +
+         `💳 *PAGAMENTO*\n` +
+         `Método: ${metodoPagamento}\n` +
+         `Status: ⏳ Aguardando comprovante\n\n` +
+         `━━━━━━━━━━━━━━━\n` +
+         `✨ Sistema Automático FF UP Pro`;
 }
 
 // Envia para WhatsApp
