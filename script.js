@@ -7,7 +7,7 @@
 
 // Configurações (EDITÁVEIS)
 const CONFIG = {
-  whatsappNumber: "244123456789", // Seu número com código do país
+  whatsappNumber: "2389149532", // Seu número com código do país
   services: {
     "Bronze": { price: 100, diamonds: 1000 },
     "Prata": { price: 150, diamonds: 2000 },
