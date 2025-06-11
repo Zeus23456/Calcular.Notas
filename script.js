@@ -16,6 +16,9 @@ if (pedidoForm) {
     const senha = document.getElementById('senha').value.trim();
     const contaLogin = document.getElementById('conta-login').value.trim();
     const valor = document.getElementById('valor').value;
+    // Formatar WhatsApp para DDI Cabo Verde (238) e remover espaços
+    const whatsappFormatado = whatsapp.replace(/\D/g, '');
+    // Montar mensagem
     const msg =
       `*Novo Pedido de Recarga*%0A` +
       `Nome: ${nome}%0A` +
@@ -25,7 +28,8 @@ if (pedidoForm) {
       `Conta de Login: ${contaLogin}%0A` +
       `Senha: ${senha}%0A` +
       `Valor: ${valor} escudos`;
-    const link = `https://wa.me/2389149532?text=${encodeURIComponent(msg)}`;
+    // Enviar para o WhatsApp correto (9234322)
+    const link = `https://wa.me/2389234322?text=${encodeURIComponent(msg)}`;
     window.open(link, '_blank');
     // Bloquear campos e botão após envio
     Array.from(pedidoForm.elements).forEach(el => {
@@ -95,11 +99,15 @@ if (jogarDadosBtn) {
   });
 }
 
-// Máscara para campo de WhatsApp (formulários)
+// Máscara para campo de WhatsApp (formulários) - formato Cabo Verde x xx xx xx
 function aplicarMascaraTelefone(input) {
   input.addEventListener('input', function() {
     let v = input.value.replace(/\D/g, '');
     v = v.slice(0, 8); // Limitar a 8 dígitos
+    // Formatar: x xx xx xx
+    if (v.length > 1) v = v.replace(/(\d{1})(\d)/, '$1 $2');
+    if (v.length > 4) v = v.replace(/(\d{1}) (\d{2})(\d)/, '$1 $2 $3');
+    if (v.length > 7) v = v.replace(/(\d{1}) (\d{2}) (\d{2})(\d)/, '$1 $2 $3 $4');
     input.value = v;
   });
 }
@@ -172,6 +180,37 @@ if (btnIndicar) {
     if (msgIndicacao) {
       msgIndicacao.textContent = '✅ Obrigado por compartilhar! Quando seu amigo recarregar, você ganha 10% de bônus!';
     }
+  };
+}
+
+// Compartilhamento do site (WhatsApp, Facebook, Copiar Link)
+const btnShareWhats = document.getElementById('btn-share-whatsapp');
+const btnShareFace = document.getElementById('btn-share-facebook');
+const btnShareLink = document.getElementById('btn-share-link');
+const msgShare = document.getElementById('msg-share');
+const urlSite = window.location.origin + window.location.pathname;
+const textoShare = 'Olha esse site de recarga de jogos! Ganhe bônus e prêmios: ' + urlSite;
+
+if (btnShareWhats) {
+  btnShareWhats.onclick = function() {
+    window.open(`https://wa.me/?text=${encodeURIComponent(textoShare)}`, '_blank');
+    if (msgShare) msgShare.textContent = 'Compartilhado no WhatsApp!';
+    setTimeout(()=>{if(msgShare)msgShare.textContent='';}, 2000);
+  };
+}
+if (btnShareFace) {
+  btnShareFace.onclick = function() {
+    window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(urlSite)}`, '_blank');
+    if (msgShare) msgShare.textContent = 'Compartilhado no Facebook!';
+    setTimeout(()=>{if(msgShare)msgShare.textContent='';}, 2000);
+  };
+}
+if (btnShareLink) {
+  btnShareLink.onclick = function() {
+    navigator.clipboard.writeText(urlSite).then(function() {
+      if (msgShare) msgShare.textContent = 'Link copiado!';
+      setTimeout(()=>{if(msgShare)msgShare.textContent='';}, 2000);
+    });
   };
 }
 
