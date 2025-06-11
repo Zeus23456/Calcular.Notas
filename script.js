@@ -16,10 +16,7 @@ if (pedidoForm) {
     const senha = document.getElementById('senha').value.trim();
     const contaLogin = document.getElementById('conta-login').value.trim();
     const valor = document.getElementById('valor').value;
-    // Criptografia simples Base64
-    const dados = `Nome: ${nome}\nWhatsApp: ${whatsapp}\nJogo: ${jogo}\nID/Nome no Jogo: ${idjogo}\nConta de Login: ${contaLogin}\nSenha: ${senha}\nValor: ${valor} escudos`;
-    const dadosCriptografados = btoa(unescape(encodeURIComponent(dados)));
-    // Montar mensagem organizada com emojis
+    // Montar mensagem organizada com emojis (sem codificação)
     const msg =
       `*Novo Pedido de Recarga*\n` +
       `👤 *Nome:* ${nome}\n` +
