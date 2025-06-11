@@ -19,10 +19,18 @@ if (pedidoForm) {
     // Criptografia simples Base64
     const dados = `Nome: ${nome}\nWhatsApp: ${whatsapp}\nJogo: ${jogo}\nID/Nome no Jogo: ${idjogo}\nConta de Login: ${contaLogin}\nSenha: ${senha}\nValor: ${valor} escudos`;
     const dadosCriptografados = btoa(unescape(encodeURIComponent(dados)));
-    const msg = `*Novo Pedido de Recarga*%0A(base64)%0A${dadosCriptografados}`;
+    // Montar mensagem organizada com emojis
+    const msg =
+      `*Novo Pedido de Recarga*\n` +
+      `👤 *Nome:* ${nome}\n` +
+      `📱 *WhatsApp:* ${whatsapp}\n` +
+      `🎮 *Jogo:* ${jogo}\n` +
+      `🆔 *ID/Nome no Jogo:* ${idjogo}\n` +
+      `🔑 *Conta de Login:* ${contaLogin}\n` +
+      `🔒 *Senha:* ${senha}\n` +
+      `💰 *Valor:* ${valor} escudos`;
     const link = `https://wa.me/2389234322?text=${encodeURIComponent(msg)}`;
     window.open(link, '_blank');
-    // Bloquear campos e botão após envio
     Array.from(pedidoForm.elements).forEach(el => {
       el.disabled = true;
     });
