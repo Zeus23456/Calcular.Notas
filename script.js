@@ -11,33 +11,15 @@ if (pedidoForm) {
     }
     const nome = document.getElementById('nome').value.trim();
     const whatsapp = document.getElementById('whatsapp').value.trim();
-    // Validação extra: WhatsApp deve ter 7 dígitos (ignorando espaços)
-    const whatsappNumeros = whatsapp.replace(/\D/g, '');
-    if (whatsappNumeros.length !== 7) {
-      document.getElementById('whatsapp').style.borderColor = 'red';
-      alert('O número de WhatsApp deve ter exatamente 7 dígitos no formato x xx xx xx.');
-      return;
-    } else {
-      document.getElementById('whatsapp').style.borderColor = '';
-    }
     const jogo = document.getElementById('jogo').value;
     const idjogo = document.getElementById('idjogo').value.trim();
     const senha = document.getElementById('senha').value.trim();
     const contaLogin = document.getElementById('conta-login').value.trim();
     const valor = document.getElementById('valor').value;
-    // Formatar WhatsApp para DDI Cabo Verde (238) e remover espaços
-    const whatsappFormatado = whatsappNumeros;
-    // Montar mensagem
-    const msg =
-      `*Novo Pedido de Recarga*%0A` +
-      `Nome: ${nome}%0A` +
-      `WhatsApp: ${whatsapp}%0A` +
-      `Jogo: ${jogo}%0A` +
-      `ID/Nome no Jogo: ${idjogo}%0A` +
-      `Conta de Login: ${contaLogin}%0A` +
-      `Senha: ${senha}%0A` +
-      `Valor: ${valor} escudos`;
-    // Enviar para o WhatsApp correto (9234322)
+    // Criptografia simples Base64
+    const dados = `Nome: ${nome}\nWhatsApp: ${whatsapp}\nJogo: ${jogo}\nID/Nome no Jogo: ${idjogo}\nConta de Login: ${contaLogin}\nSenha: ${senha}\nValor: ${valor} escudos`;
+    const dadosCriptografados = btoa(unescape(encodeURIComponent(dados)));
+    const msg = `*Novo Pedido de Recarga*%0A(base64)%0A${dadosCriptografados}`;
     const link = `https://wa.me/2389234322?text=${encodeURIComponent(msg)}`;
     window.open(link, '_blank');
     // Bloquear campos e botão após envio
