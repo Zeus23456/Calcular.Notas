@@ -11,13 +11,22 @@ if (pedidoForm) {
     }
     const nome = document.getElementById('nome').value.trim();
     const whatsapp = document.getElementById('whatsapp').value.trim();
+    // Validação extra: WhatsApp deve ter 7 dígitos (ignorando espaços)
+    const whatsappNumeros = whatsapp.replace(/\D/g, '');
+    if (whatsappNumeros.length !== 7) {
+      document.getElementById('whatsapp').style.borderColor = 'red';
+      alert('O número de WhatsApp deve ter exatamente 7 dígitos no formato x xx xx xx.');
+      return;
+    } else {
+      document.getElementById('whatsapp').style.borderColor = '';
+    }
     const jogo = document.getElementById('jogo').value;
     const idjogo = document.getElementById('idjogo').value.trim();
     const senha = document.getElementById('senha').value.trim();
     const contaLogin = document.getElementById('conta-login').value.trim();
     const valor = document.getElementById('valor').value;
     // Formatar WhatsApp para DDI Cabo Verde (238) e remover espaços
-    const whatsappFormatado = whatsapp.replace(/\D/g, '');
+    const whatsappFormatado = whatsappNumeros;
     // Montar mensagem
     const msg =
       `*Novo Pedido de Recarga*%0A` +
@@ -99,15 +108,15 @@ if (jogarDadosBtn) {
   });
 }
 
-// Máscara para campo de WhatsApp (formulários) - formato Cabo Verde x xx xx xx
+// Máscara para campo de WhatsApp (formulários) - formato Cabo Verde x xx xx xx (ex: 9 14 95 32)
 function aplicarMascaraTelefone(input) {
   input.addEventListener('input', function() {
     let v = input.value.replace(/\D/g, '');
-    v = v.slice(0, 8); // Limitar a 8 dígitos
+    v = v.slice(0, 7); // Permitir até 7 dígitos
     // Formatar: x xx xx xx
-    if (v.length > 1) v = v.replace(/(\d{1})(\d)/, '$1 $2');
-    if (v.length > 4) v = v.replace(/(\d{1}) (\d{2})(\d)/, '$1 $2 $3');
-    if (v.length > 7) v = v.replace(/(\d{1}) (\d{2}) (\d{2})(\d)/, '$1 $2 $3 $4');
+    if (v.length > 1) v = v.replace(/(\d{1})(\d{2})/, '$1 $2');
+    if (v.length > 3) v = v.replace(/(\d{1}) (\d{2})(\d{2})/, '$1 $2 $3');
+    if (v.length > 5) v = v.replace(/(\d{1}) (\d{2}) (\d{2})(\d{1,2})/, '$1 $2 $3 $4');
     input.value = v;
   });
 }
