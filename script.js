@@ -99,8 +99,7 @@ if (jogarDadosBtn) {
 function aplicarMascaraTelefone(input) {
   input.addEventListener('input', function() {
     let v = input.value.replace(/\D/g, '');
-    if (v.length > 3) v = v.replace(/(\d{3})(\d)/, '$1 $2');
-    if (v.length > 7) v = v.replace(/(\d{3}) (\d{3})(\d)/, '$1 $2 $3');
+    v = v.slice(0, 8); // Limitar a 8 dígitos
     input.value = v;
   });
 }
@@ -280,3 +279,18 @@ if (roletaCanvas) desenharRoleta();
 if (girarBtn) {
   girarBtn.onclick = girarRoletaAnimado;
 }
+
+document.addEventListener('DOMContentLoaded', function() {
+  // Garantir que a roleta seja desenhada após o DOM estar pronto
+  if (roletaCanvas && typeof desenharRoleta === 'function') {
+    // Ajustar tamanho do canvas para mobile
+    if (window.innerWidth <= 600) {
+      roletaCanvas.width = 180;
+      roletaCanvas.height = 180;
+    } else {
+      roletaCanvas.width = 260;
+      roletaCanvas.height = 260;
+    }
+    desenharRoleta();
+  }
+});
