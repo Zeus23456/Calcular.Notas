@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="pt-CV">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Calculadora de Notas - ZEUS</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #181c24 60%, #232a36 200%);
+      color: #e0e6ed;
+      display: flex;
+      min-height: 100vh;
+      flex-direction: column;
+    }
+    header {
+      background: linear-gradient(90deg, #232a36 60%, #3b4252 100%);
+      color: #fff;
+      text-shadow: 0 2px 8px #0008;
+      padding: 1.2rem 0.5rem;
+      text-align: center;
+      font-weight: bold;
+      font-size: 2rem;
+      letter-spacing: 1px;
+      box-shadow: 0 3px 8px rgba(36,44,60,0.18);
+      user-select: none;
+      border-bottom-left-radius: 18px;
+      border-bottom-right-radius: 18px;
+    }
+    main {
+      flex: 1;
+      display: flex;
+      flex-wrap: wrap;
+      padding: 24px;
+      gap: 24px;
+      justify-content: center;
+      background: #181c24;
+    }
+    section.form-section, section.history-section {
+      background: #232a36;
+      padding: 24px 20px 20px 20px;
+      border-radius: 18px;
+      box-shadow: 0 4px 24px #232a3688, 0 1.5px 8px #0002;
+      border: 1.5px solid #3b4252;
+      margin-bottom: 0;
+    }
+    section.form-section {
+      flex: 1 1 340px;
+      max-width: 480px;
+      min-width: 260px;
+    }
+    section.history-section {
+      max-width: 370px;
+      flex: 1 1 300px;
+      color: #e0e6ed;
+      min-width: 220px;
+    }
+    h2 {
+      color: #8fbcbb;
+      margin-bottom: 1.2rem;
+      text-align: center;
+      user-select: none;
+      font-size: 1.4rem;
+    }
+    label {
+      display: block;
+      margin: 14px 0 6px;
+      font-weight: 600;
+      user-select: none;
+      font-size: 1.08rem;
+      color: #b3c6e0;
+    }
+    input[type="number"] {
+      width: 100%;
+      padding: 12px;
+      border-radius: 10px;
+      border: 1.5px solid #3b4252;
+      font-size: 1.08rem;
+      background-color: #181c24;
+      color: #e0e6ed;
+      outline: none;
+      transition: border-color 0.3s, background-color 0.3s;
+      margin-bottom: 2px;
+    }
+    input[type="number"]:focus {
+      background-color: #232a36;
+      border-color: #8fbcbb;
+    }
+    button.calc-btn {
+      margin-top: 20px;
+      width: 100%;
+      padding: 16px;
+      font-weight: 700;
+      font-size: 1.15rem;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      background: linear-gradient(90deg, #8fbcbb 60%, #3b4252 100%);
+      color: #232a36;
+      transition: background 0.3s, box-shadow 0.3s;
+      user-select: none;
+      box-shadow: 0 2px 8px #232a3688;
+      letter-spacing: 1px;
+    }
+    button.calc-btn:hover {
+      background: linear-gradient(90deg, #5e81ac 60%, #232a36 100%);
+      box-shadow: 0 4px 16px #232a3688;
+    }
+    textarea {
+      margin-top: 15px;
+      width: 100%;
+      height: 80px;
+      resize: none;
+      font-size: 1.13rem;
+      border-radius: 10px;
+      border: 1.5px solid #3b4252;
+      padding: 12px;
+      background-color: #181c24;
+      color: #8fbcbb;
+      font-weight: 700;
+      user-select: text;
+      box-shadow: 0 1px 6px #232a3622;
+      margin-bottom: 0.5rem;
+    }
+    .history-box {
+      background: #181c24;
+      border-radius: 10px;
+      padding: 15px;
+      height: 240px;
+      overflow-y: auto;
+      font-family: monospace;
+      font-size: 1.05rem;
+      line-height: 1.5;
+      white-space: pre-line;
+      margin-bottom: 1.2rem;
+      box-shadow: 0 1px 6px #232a3622;
+      color: #e0e6ed;
+    }
+    #chartContainer {
+      margin-top: 20px;
+      background: #232a36;
+      padding: 15px 8px 8px 8px;
+      border-radius: 14px;
+      box-shadow: 0 0 15px #232a3688;
+    }
+    /* Responsividade */
+    @media(max-width: 900px) {
+      main {
+        flex-direction: column;
+        align-items: center;
+        padding: 10px;
+        gap: 12px;
+      }
+      section.history-section {
+        max-width: 100%;
+        width: 98vw;
+        height: auto;
+        min-width: 0;
+      }
+    }
+    @media (max-width: 600px) {
+      header {
+        font-size: 1.2rem;
+        padding: 0.7rem 0.2rem;
+      }
+      main {
+        padding: 4px;
+        gap: 8px;
+      }
+      section.form-section, section.history-section {
+        max-width: 100%;
+        width: 100%;
+        margin: 0 0 10px 0;
+        padding: 10px 4px 8px 4px;
+        border-radius: 10px;
+      }
+      h2 {
+        font-size: 1.1rem;
+      }
+      input, button, textarea {
+        font-size: 1.05rem;
+        padding: 10px;
+      }
+      .history-box {
+        font-size: 0.98rem;
+        padding: 10px;
+        height: 160px;
+      }
+      #chartContainer {
+        padding: 4px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>Calculadora de Notas Escolares - Desenvolvido por ZEUS</header>
+
+  <main>
+    <!-- Formulário do Trimestre -->
+    <section class="form-section" aria-label="Cálculo da nota do trimestre">
+      <h2>Nota do Trimestre</h2>
+      <label for="teste1">Teste 1 (25%)</label>
+      <input type="number" id="teste1" min="0" max="20" step="0.1" placeholder="0 a 20" />
+
+      <label for="teste2">Teste 2 (25%)</label>
+      <input type="number" id="teste2" min="0" max="20" step="0.1" placeholder="0 a 20" />
+
+      <label for="tp">Trabalho Prático (10%)</label>
+      <input type="number" id="tp" min="0" max="20" step="0.1" placeholder="0 a 20" />
+
+      <label for="tg">Trabalho de Grupo (10%)</label>
+      <input type="number" id="tg" min="0" max="20" step="0.1" placeholder="0 a 20" />
+
+      <label for="obs">Observação (20%)</label>
+      <input type="number" id="obs" min="0" max="20" step="0.1" placeholder="0 a 20" />
+
+      <label for="ti">Trabalho Individual (10%)</label>
+      <input type="number" id="ti" min="0" max="20" step="0.1" placeholder="0 a 20" />
+
+      <button class="calc-btn" onclick="calcularTrimestre()">Calcular Nota do Trimestre</button>
+      <textarea id="resultadoTrimestre" readonly placeholder="Resultado aparecerá aqui"></textarea>
+    </section>
+
+    <!-- Formulário do Ano -->
+    <section class="form-section" aria-label="Cálculo da nota final do ano">
+      <h2>Nota Final do Ano</h2>
+      <label for="tri1">1º Trimestre</label>
+      <input type="number" id="tri1" min="0" max="20" step="0.01" placeholder="0 a 20" />
+
+      <label for="tri2">2º Trimestre</label>
+      <input type="number" id="tri2" min="0" max="20" step="0.01" placeholder="0 a 20" />
+
+      <label for="tri3">3º Trimestre</label>
+      <input type="number" id="tri3" min="0" max="20" step="0.01" placeholder="0 a 20" />
+
+      <button class="calc-btn" onclick="calcularAno()">Calcular Nota do Ano</button>
+      <textarea id="resultadoAno" readonly placeholder="Resultado aparecerá aqui"></textarea>
+    </section>
+
+    <!-- Formulário do Ciclo -->
+    <section class="form-section" aria-label="Cálculo da nota do ciclo">
+      <h2>Nota do Ciclo</h2>
+      <label for="notaAno">Nota do Ano (70%)</label>
+      <input type="number" id="notaAno" min="0" max="20" step="0.01" placeholder="0 a 20" />
+
+      <label for="testeFinal">Teste Final (30%)</label>
+      <input type="number" id="testeFinal" min="0" max="20" step="0.01" placeholder="0 a 20" />
+
+      <button class="calc-btn" onclick="calcularCiclo()">Calcular Nota do Ciclo</button>
+      <textarea id="resultadoCiclo" readonly placeholder="Resultado aparecerá aqui"></textarea>
+    </section>
+
+    <!-- Quadro lateral com histórico -->
+    <section class="history-section" aria-label="Histórico das últimas notas">
+      <h2>Histórico das Notas</h2>
+      <div class="history-box" id="historyBox">
+        Nenhum cálculo realizado ainda.
+      </div>
+
+      <!-- Gráfico de barras -->
+      <div id="chartContainer">
+        <canvas id="notasChart" width="320" height="180" aria-label="Gráfico de barras das notas dos trimestres"></canvas>
+      </div>
+    </section>
+  </main>
+
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    // Histórico armazenado
+    const historico = {
+      trimestres: [],
+      anos: [],
+      ciclos: []
+    };
+
+    // Função para validar entrada
+    function validarNota(nota) {
+      return typeof nota === 'number' && !isNaN(nota) && nota >= 0 && nota <= 20;
+    }
+
+    // Função para arredondar para o inteiro mais próximo
+    function arredondarNota(nota) {
+      return Math.round(nota);
+    }
+
+    // Função para calcular a nota do trimestre
+    function calcularTrimestre() {
+      const teste1 = parseFloat(document.getElementById('teste1').value);
+      const teste2 = parseFloat(document.getElementById('teste2').value);
+      const tp = parseFloat(document.getElementById('tp').value);
+      const tg = parseFloat(document.getElementById('tg').value);
+      const obs = parseFloat(document.getElementById('obs').value);
+      const ti = parseFloat(document.getElementById('ti').value);
+
+      if (![teste1, teste2, tp, tg, obs, ti].every(validarNota)) {
+        alert('Preencha todas as notas com valores entre 0 e 20.');
+        return;
+      }
+
+      const notaTrimestre = (teste1 * 0.25) + (teste2 * 0.25) + (tp * 0.10) + (tg * 0.10) + (obs * 0.20) + (ti * 0.10);
+      const notaTrimestreArred = arredondarNota(notaTrimestre);
+      const resArea = document.getElementById('resultadoTrimestre');
+      resArea.value = `${notaTrimestre.toFixed(2)} (Arredondada: ${notaTrimestreArred})`;
+
+      historico.trimestres.push(notaTrimestre);
+      atualizarHistorico();
+      atualizarGrafico();
+    }
+
+    // Função para calcular nota final do ano
+    function calcularAno() {
+      const tri1 = parseFloat(document.getElementById('tri1').value);
+      const tri2 = parseFloat(document.getElementById('tri2').value);
+      const tri3 = parseFloat(document.getElementById('tri3').value);
+
+      if (![tri1, tri2, tri3].every(validarNota)) {
+        alert('Preencha as notas dos três trimestres entre 0 e 20.');
+        return;
+      }
+
+      const notaAno = (tri1 + tri2 + tri3) / 3;
+      const notaAnoArred = arredondarNota(notaAno);
+      const resArea = document.getElementById('resultadoAno');
+      resArea.value = `${notaAno.toFixed(2)} (Arredondada: ${notaAnoArred})`;
+
+      historico.anos.push(notaAno);
+      atualizarHistorico();
+    }
+
+    // Função para calcular nota do ciclo
+    function calcularCiclo() {
+      const notaAno = parseFloat(document.getElementById('notaAno').value);
+      const testeFinal = parseFloat(document.getElementById('testeFinal').value);
+
+      if (![notaAno, testeFinal].every(validarNota)) {
+        alert('Preencha as notas do ano e do teste final entre 0 e 20.');
+        return;
+      }
+
+      const notaCiclo = (notaAno * 0.70) + (testeFinal * 0.30);
+      const notaCicloArred = arredondarNota(notaCiclo);
+      const resArea = document.getElementById('resultadoCiclo');
+      resArea.value = `${notaCiclo.toFixed(2)} (Arredondada: ${notaCicloArred})`;
+
+      historico.ciclos.push(notaCiclo);
+      atualizarHistorico();
+    }
+
+    // Atualiza o histórico lateral
+    function atualizarHistorico() {
+      const box = document.getElementById('historyBox');
+      let texto = '';
+
+      if (historico.trimestres.length) {
+        texto += 'Últimas Notas do Trimestre:\n';
+        historico.trimestres.slice(-5).forEach((nota,i) => {
+          texto += ` ${i+1}. ${nota.toFixed(2)}\n`;
+        });
+      } else texto += 'Nenhuma nota de trimestre calculada.\n';
+
+      if (historico.anos.length) {
+        texto += '\nÚltimas Notas do Ano:\n';
+        historico.anos.slice(-5).forEach((nota,i) => {
+          texto += ` ${i+1}. ${nota.toFixed(2)}\n`;
+        });
+      } else texto += '\nNenhuma nota do ano calculada.\n';
+
+      if (historico.ciclos.length) {
+        texto += '\nÚltimas Notas do Ciclo:\n';
+        historico.ciclos.slice(-5).forEach((nota,i) => {
+          texto += ` ${i+1}. ${nota.toFixed(2)}\n`;
+        });
+      } else texto += '\nNenhuma nota de ciclo calculada.\n';
+
+      box.textContent = texto;
+    }
+
+    // Configuração do gráfico com Chart.js
+    const ctx = document.getElementById('notasChart').getContext('2d');
+    const notasChart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: ['Trimestre 1', 'Trimestre 2', 'Trimestre 3'],
+        datasets: [{
+          label: 'Notas dos Trimestres',
+          data: [0,0,0],
+          backgroundColor: '#00ff88'
+        }]
+      },
+      options: {
+        scales: {
+          y: {
+            beginAtZero: true,
+            max: 20
+          }
+        },
+        plugins: {
+          legend: {
+            labels: {
+              color: '#0f0'
+            }
+          }
+        }
+      }
+    });
+
+    // Atualiza o gráfico com as últimas notas dos trimestres
+    function atualizarGrafico() {
+      // Pegamos até as últimas 3 notas do trimestre, preenche com 0 se faltar
+      const ultimas = historico.trimestres.slice(-3);
+      const data = [0,0,0];
+      for(let i=0; i<ultimas.length; i++) {
+        data[i] = ultimas[i];
+      }
+      notasChart.data.datasets[0].data = data;
+      notasChart.update();
+    }
+
+    // Inicializa histórico vazio
+    atualizarHistorico();
+    atualizarGrafico();
+  </script>
+</body>
+</html>
